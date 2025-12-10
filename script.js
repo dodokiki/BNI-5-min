@@ -54,8 +54,50 @@ nextBtn.addEventListener('click', nextSlide);
 prevBtn.addEventListener('click', prevSlide);
 
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') nextSlide();
-    if (e.key === 'ArrowLeft') prevSlide();
+    // Keyboard navigation
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter' || e.key === 'PageDown') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+    // Escape to go to first slide
+    if (e.key === 'Escape') {
+        currentSlide = 0;
+        updateSlide();
+    }
+});
+
+// Click anywhere on screen to go to next slide (for presentation remotes)
+let clickTimeout;
+document.addEventListener('click', (e) => {
+    // Don't trigger on navigation buttons
+    if (e.target.closest('.nav-controls')) return;
+    
+    // Clear previous timeout
+    clearTimeout(clickTimeout);
+    
+    // Determine click position
+    const clickX = e.clientX;
+    const screenWidth = window.innerWidth;
+    
+    // Left side = previous, Right side = next
+    if (clickX < screenWidth / 3) {
+        prevSlide();
+    } else if (clickX > screenWidth * 2 / 3) {
+        nextSlide();
+    } else {
+        // Center = next slide
+        nextSlide();
+    }
+});
+
+// Support for presentation remotes (Page Up/Down, Home/End)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Home') {
+        currentSlide = 0;
+        updateSlide();
+    }
+    if (e.key === 'End') {
+        currentSlide = totalSlides - 1;
+        updateSlide();
+    }
 });
 
 // Matrix/Digital Rain Background Effect
